@@ -1,4 +1,5 @@
-FROM ubuntu:trusty
+#FROM ubuntu:trusty
+FROM zerodivide1/docker-novnc
 
 # Set Locale
 
@@ -6,8 +7,6 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
-
-RUN apt-get -qq remove ffmpeg
 
 RUN echo deb http://archive.ubuntu.com/ubuntu precise universe multiverse >> /etc/apt/sources.list; \
     apt-get update -qq && apt-get install -y --force-yes \
@@ -28,11 +27,23 @@ RUN echo deb http://archive.ubuntu.com/ubuntu precise universe multiverse >> /et
     wget \
     libboost-all-dev \
     libeigen3-dev \
+    libqt4-dev \
+    libqglviewer-dev \
+    libpythonqt-dev \
+    libglew-dev \
     unzip; \
     apt-get clean
 
+RUN apt-get install -y --force-yes \
+    libqt4-dev \
+    libqglviewer-dev
+
+RUN apt-get install -y --force-yes \
+    libpythonqt-dev libglew-dev;
+
+
 WORKDIR /usr/local/src
-RUN git clone https://github.com/nithins/mscomplex-tri.git
+RUN git clone https://github.com/ebenolson/mscomplex-tri.git
 
 WORKDIR /usr/local/src/mscomplex-tri
 RUN git submodule update --init
@@ -42,6 +53,7 @@ RUN mkdir -p build
 
 WORKDIR /usr/local/src/build
 RUN cmake -D BUILD_PYMSTRI=ON \
+          -D BUILD_VIEWER=ON \
           -D PYTHON_SITE_PACKAGES_INSTALL_DIR=/usr/lib/python2.7 \
           ../mscomplex-tri
 
